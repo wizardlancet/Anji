@@ -1,0 +1,240 @@
+<div align="center">
+
+# Chinvat
+
+**PDF 转 AI Agent 知识桥梁**
+
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://pypi.org/project/chinvat/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/chinvat/chinvat/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/chinvat)](https://pypi.org/project/chinvat/)
+
+将 PDF 转换为增强的、AI Agent 可读的 Markdown/JSON 文档。
+
+[功能特性](#功能特性) • [快速开始](#快速开始) • [安装](#安装) • [使用文档](#使用文档)
+
+</div>
+
+---
+
+## 什么是 Chinvat？
+
+Chinvat 希望解决 PDF 格式 与 AI Agent 之间的鸿沟。PDF 是为人类阅读设计的固定版面格式，而 AI Agent 需要的是结构化、语义明确的文本。
+
+Chinvat 采用以下技术栈：
+
+- **PaddleOCR-VL** - 高质量 PDF 转 Markdown
+- **Ovis2.5-9B 视觉语言模型** - 智能图像分析
+- **Mistune** - 灵活的 AST 操作
+
+## 功能特性
+
+| 功能 | 描述 |
+|------|------|
+| **智能 OCR** | 提取文本、表格和图片，保持版面结构 |
+| **VLM 图像分析** | 为嵌入图片生成标题和描述 |
+| **装饰元素过滤** | 自动移除 logo、水印、分割线等 |
+| **标题层级修正**(developing) | 修复 OCR 输出的标题层级问题 |
+| **多格式输出** | 支持 Markdown、JSON、Structured 格式 |
+| **批量处理** | 高效处理多个 PDF 文件 |
+| **灵活流水线** | 可运行完整流程或单独步骤 |
+
+## 快速开始
+
+```bash
+# 安装
+pip install -e .
+
+# 转换 PDF
+chinvat pipeline document.pdf output/
+
+# 或作为 Python 库使用
+python -c "
+from chinvat import run_full_pipeline
+run_full_pipeline('document.pdf', 'output/')
+"
+```
+
+## 安装
+
+```bash
+# 基础安装
+pip install -e .
+
+# 安装开发依赖
+pip install -e ".[dev]"
+```
+
+### 前置条件
+
+Chinvat 需要运行两个外部服务：
+
+1. **PaddleOCR-VL 服务器**（端口 8118）
+2. **Ovis2.5-9B VLM 服务器**（端口 8000）
+
+详细配置说明请参考 [references/readme.md](references/readme.md)。
+
+## 使用文档
+
+### 命令行
+
+```bash
+# 完整流水线
+chinvat pipeline input.pdf output_dir
+
+# 批量处理
+chinvat batch output_base file1.pdf file2.pdf file3.pdf
+
+# 单独步骤
+chinvat pdf input.pdf output_dir          # PDF → Markdown
+chinvat image input.md output.md          # 分析图片
+chinvat md enhance input.md output.md     # 增强 AST
+chinvat md export input.md out --format json  # 导出
+```
+
+### Python API
+
+```python
+from chinvat import Pipeline, run_full_pipeline, batch_pipeline
+
+# 简单用法
+run_full_pipeline("document.pdf", "output/")
+
+# 高级用法
+pipeline = Pipeline(
+    paddleocr_server_url="http://localhost:8118/v1",
+    vlm_server_url="http://localhost:8000/v1"
+)
+
+outputs = pipeline.run(
+    input_path="document.pdf",
+    output_folder="output",
+    format="both"  # markdown, json, structured, 或 both
+)
+
+# 批量处理
+batch_pipeline(
+    input_paths=["doc1.pdf", "doc2.pdf"],
+    output_base_folder="batch_output"
+)
+
+pipeline.close()
+```
+
+## 输出结构
+
+```
+output/
+└── document_name/
+    └── enhanced/
+        ├── document.md     # 增强后的 Markdown
+        └── document.json   # JSON AST（可选）
+```
+
+## 技术架构
+
+```
+PDF 文档
+     │
+     ▼
+┌─────────────────┐
+│ 1. PDF → Markdown │  PaddleOCR-VL
+│    (pdf_converter.py) │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ 2. Markdown → AST │  Mistune
+│     (ast_handler.py)  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ 3. 增强 AST       │  图像分析 + 内容过滤
+│ (enhancement.py) │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ 4. 导出          │  Markdown / JSON / Structured
+│   (exporters.py) │
+└─────────────────┘
+         │
+         ▼
+   AI-Ready 输出
+```
+
+## 配置说明
+
+### 环境变量
+
+| 变量 | 默认值 | 描述 |
+|------|--------|------|
+| `API_BASE_URL` | `http://localhost:8000/v1` | VLM 服务器地址 |
+| `API_KEY` | `abc-123` | VLM API 密钥 |
+| `MODEL_NAME` | `AIDC-AI/Ovis2.5-9B` | VLM 模型名称 |
+
+### CLI 选项
+
+```bash
+chinvat pipeline input.pdf output/ \
+  --format markdown|json|structured|both \
+  --no-enhance \
+  --no-fix-headings \
+  --no-filter-decorative \
+  --no-enrich-images \
+  --dummy  # 测试时不调用 API
+```
+
+## 开发指南
+
+```bash
+# 代码格式化
+black chinvat/
+
+# 代码检查
+ruff check chinvat/
+
+# 类型检查
+mypy chinvat/
+
+# 运行测试
+pytest
+```
+
+## 项目结构
+
+```
+chinvat/
+├── chinvat/              # 主包
+│   ├── __init__.py       # 导出接口
+│   ├── main.py           # CLI 入口
+│   ├── cli.py            # 命令行接口
+│   ├── pipeline.py       # 流水线编排
+│   ├── pdf_converter.py  # PDF 转 Markdown
+│   ├── image_analyzer.py # VLM 图像分析
+│   ├── ast_handler.py    # AST 操作
+│   ├── enhancement.py    # AST 增强
+│   └── exporters.py      # 导出工具
+├── pyproject.toml        # 包配置
+├── README.md            # 英文文档
+├── README_CN.md         # 中文文档
+├── CLAUDE.md            # Claude Code 上下文
+├── .gitignore
+└── references/          # 参考实现
+```
+
+## 许可证
+
+MIT License。详见 [LICENSE](LICENSE)。
+
+## 贡献指南
+
+欢迎贡献代码！开发前请阅读 [CLAUDE.md](CLAUDE.md) 了解开发规范。
+
+---
+
+<div align="center">
+
+**为 AI Agent 而生，由 AI Agent 构建**
+
+</div>
