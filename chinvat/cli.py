@@ -102,6 +102,16 @@ def build_pipeline_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Don't remove intermediate files",
     )
+    parser.add_argument(
+        "--no-keep-images",
+        action="store_true",
+        help="Don't keep images folder in output (default: keep)",
+    )
+    parser.add_argument(
+        "--embed-base64",
+        action="store_true",
+        help="Embed images as base64 data URLs in markdown",
+    )
 
     return parser
 
@@ -152,6 +162,21 @@ def build_batch_parser() -> argparse.ArgumentParser:
         "--no-auto-naming",
         action="store_true",
         help="Use sequential naming (1, 2, ...) instead of filenames",
+    )
+    parser.add_argument(
+        "--no-cleanup",
+        action="store_true",
+        help="Don't remove intermediate files",
+    )
+    parser.add_argument(
+        "--no-keep-images",
+        action="store_true",
+        help="Don't keep images folder in output (default: keep)",
+    )
+    parser.add_argument(
+        "--embed-base64",
+        action="store_true",
+        help="Embed images as base64 data URLs in markdown",
     )
 
     return parser
@@ -274,6 +299,56 @@ def build_parser() -> argparse.ArgumentParser:
         default="markdown",
         help="Output format",
     )
+    pipeline_parser.add_argument(
+        "--no-enhance",
+        action="store_true",
+        help="Disable enhancement step",
+    )
+    pipeline_parser.add_argument(
+        "--no-fix-headings",
+        action="store_true",
+        help="Don't fix heading levels",
+    )
+    pipeline_parser.add_argument(
+        "--no-filter-decorative",
+        action="store_true",
+        help="Don't filter decorative images",
+    )
+    pipeline_parser.add_argument(
+        "--no-enrich-images",
+        action="store_true",
+        help="Don't enrich images with analysis",
+    )
+    pipeline_parser.add_argument(
+        "--no-merge-tables",
+        action="store_true",
+        help="Don't merge cross-page tables",
+    )
+    pipeline_parser.add_argument(
+        "--no-relevel-titles",
+        action="store_true",
+        help="Don't rebuild headings in OCR",
+    )
+    pipeline_parser.add_argument(
+        "--no-concatenate",
+        action="store_true",
+        help="Don't concatenate pages",
+    )
+    pipeline_parser.add_argument(
+        "--no-cleanup",
+        action="store_true",
+        help="Don't remove intermediate files",
+    )
+    pipeline_parser.add_argument(
+        "--no-keep-images",
+        action="store_true",
+        help="Don't keep images folder in output (default: keep)",
+    )
+    pipeline_parser.add_argument(
+        "--embed-base64",
+        action="store_true",
+        help="Embed images as base64 data URLs in markdown",
+    )
 
     # Batch command
     batch_parser = subparsers.add_parser(
@@ -320,6 +395,56 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-auto-naming",
         action="store_true",
         help="Use sequential naming",
+    )
+    batch_parser.add_argument(
+        "--no-enhance",
+        action="store_true",
+        help="Disable enhancement step",
+    )
+    batch_parser.add_argument(
+        "--no-fix-headings",
+        action="store_true",
+        help="Don't fix heading levels",
+    )
+    batch_parser.add_argument(
+        "--no-filter-decorative",
+        action="store_true",
+        help="Don't filter decorative images",
+    )
+    batch_parser.add_argument(
+        "--no-enrich-images",
+        action="store_true",
+        help="Don't enrich images with analysis",
+    )
+    batch_parser.add_argument(
+        "--no-merge-tables",
+        action="store_true",
+        help="Don't merge cross-page tables",
+    )
+    batch_parser.add_argument(
+        "--no-relevel-titles",
+        action="store_true",
+        help="Don't rebuild headings in OCR",
+    )
+    batch_parser.add_argument(
+        "--no-concatenate",
+        action="store_true",
+        help="Don't concatenate pages",
+    )
+    batch_parser.add_argument(
+        "--no-cleanup",
+        action="store_true",
+        help="Don't remove intermediate files",
+    )
+    batch_parser.add_argument(
+        "--no-keep-images",
+        action="store_true",
+        help="Don't keep images folder in output (default: keep)",
+    )
+    batch_parser.add_argument(
+        "--embed-base64",
+        action="store_true",
+        help="Embed images as base64 data URLs in markdown",
     )
 
     # PDF command (wrapper around pdf_converter)
@@ -507,6 +632,8 @@ def _run_pipeline(args) -> int:
             relevel_titles=not args.no_relevel_titles if hasattr(args, "no_relevel_titles") else True,
             concatenate_pages=not args.no_concatenate if hasattr(args, "no_concatenate") else True,
             cleanup=not args.no_cleanup if hasattr(args, "no_cleanup") else True,
+            keep_images=not args.no_keep_images if hasattr(args, "no_keep_images") else True,
+            embed_base64=args.embed_base64 if hasattr(args, "embed_base64") else False,
         )
 
         print("\n" + "=" * 50)
@@ -551,6 +678,16 @@ def _run_batch(args) -> int:
             output_base_folder=args.output_base,
             format=args.format,
             auto_naming=not args.no_auto_naming,
+            enhance=not args.no_enhance if hasattr(args, "no_enhance") else True,
+            fix_headings=not args.no_fix_headings if hasattr(args, "no_fix_headings") else True,
+            filter_decorative=not args.no_filter_decorative if hasattr(args, "no_filter_decorative") else True,
+            enrich_images=not args.no_enrich_images if hasattr(args, "no_enrich_images") else True,
+            merge_tables=not args.no_merge_tables if hasattr(args, "no_merge_tables") else True,
+            relevel_titles=not args.no_relevel_titles if hasattr(args, "no_relevel_titles") else True,
+            concatenate_pages=not args.no_concatenate if hasattr(args, "no_concatenate") else True,
+            cleanup=not args.no_cleanup if hasattr(args, "no_cleanup") else True,
+            keep_images=not args.no_keep_images if hasattr(args, "no_keep_images") else True,
+            embed_base64=args.embed_base64 if hasattr(args, "embed_base64") else False,
         )
 
         print("\n" + "=" * 50)

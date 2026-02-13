@@ -6,22 +6,33 @@ different formats including Markdown, JSON, and structured data.
 
 from __future__ import annotations
 
+import base64
 import json
+import os
+import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from chinvat.ast_handler import MarkdownAST, render_inline
+
+
+# Pattern to match markdown image syntax
+MD_IMG_PATTERN = re.compile(r'!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)')
 
 
 def export_to_markdown(
     tokens: list[dict[str, Any]],
     output_path: Optional[str] = None,
+    embed_base64: bool = False,
+    images_dir: Optional[str] = None,
 ) -> str:
     """Export AST tokens to Markdown format.
 
     Args:
         tokens: The AST tokens to export.
         output_path: Optional path to save the output.
+        embed_base64: Whether to embed images as base64 data URLs.
+        images_dir: Optional directory containing images (used for base64 embedding).
 
     Returns:
         The Markdown string.
@@ -29,10 +40,81 @@ def export_to_markdown(
     ast_handler = MarkdownAST()
     markdown = ast_handler.render(tokens)
 
+    # Embed images as base64 if requested
+    if embed_base64 and images_dir:
+        markdown = embed_images_as_base64(markdown, images_dir)
+
     if output_path:
-        Path(output_path).write_text(markdown, encoding="utf-8")
+        output_path_obj = Path(output_path)
+        output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+        output_path_obj.write_text(markdown, encoding="utf-8")
 
     return markdown
+
+
+def embed_images_as_base64(markdown: str, images_dir: str) -> str:
+    """Replace image references with base64 data URLs in markdown.
+
+    Args:
+        markdown: The markdown content.
+        images_dir: Directory containing the images.
+
+    Returns:
+        Markdown with images embedded as base64.
+    """
+
+    def replace_image(match):
+        alt_text = match.group(1)
+        image_path = match.group(2)
+
+        # Skip if already base64 or URL
+        if image_path.startswith(("http://", "https://", "data:")):
+            return match.group(0)
+
+        # Try to find the image file
+        # Handle both relative paths (imgs/xxx.jpg) and absolute paths
+        if not os.path.isabs(image_path):
+            # images_dir is already the full path to the imgs folder
+            # But markdown may have paths like "imgs/xxx.jpg", so we need to handle both
+            full_path = os.path.join(images_dir, image_path)
+            # If not found, try stripping imgs/ prefix
+            if not os.path.exists(full_path) and image_path.startswith("imgs/"):
+                full_path = os.path.join(images_dir, image_path[5:])  # Remove "imgs/" prefix
+        else:
+            full_path = image_path
+
+        # Try common extensions if file not found
+        if not os.path.exists(full_path):
+            base, ext = os.path.splitext(full_path)
+            for new_ext in ['.jpg', '.png', '.jpeg', '.gif', '.webp']:
+                if os.path.exists(base + new_ext):
+                    full_path = base + new_ext
+                    break
+
+        if os.path.exists(full_path):
+            try:
+                suffix = Path(full_path).suffix.lower()
+                mime_map = {
+                    ".png": "image/png",
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg",
+                    ".gif": "image/gif",
+                    ".webp": "image/webp",
+                    ".bmp": "image/bmp",
+                }
+                mime = mime_map.get(suffix, "image/png")
+
+                with open(full_path, "rb") as f:
+                    b64 = base64.b64encode(f.read()).decode()
+
+                data_url = f"data:{mime};base64,{b64}"
+                return f"![{alt_text}]({data_url})"
+            except Exception as e:
+                print(f"Warning: Failed to embed image {full_path}: {e}")
+
+        return match.group(0)
+
+    return MD_IMG_PATTERN.sub(replace_image, markdown)
 
 
 def export_to_json(

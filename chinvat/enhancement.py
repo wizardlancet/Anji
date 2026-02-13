@@ -111,8 +111,10 @@ class Enhancer:
 
             results = asyncio.run(self.image_analyzer.analyze_images(image_paths))
             for path, result in results.items():
+                # path is a string from the dict key
+                path_obj = Path(path)
                 if not result.get("is_informative", True):
-                    non_informative.add(path.stem if path.suffix else str(path))
+                    non_informative.add(path_obj.stem if path_obj.suffix else str(path))
 
         # Filter tokens
         return self._filter_images_from_tokens(tokens, non_informative)

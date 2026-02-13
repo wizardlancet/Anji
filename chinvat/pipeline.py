@@ -105,6 +105,8 @@ class Pipeline:
         relevel_titles: bool = True,
         concatenate_pages: bool = True,
         cleanup: bool = True,
+        keep_images: bool = True,
+        embed_base64: bool = False,
     ) -> dict[str, str]:
         """Run the full pipeline on a single PDF.
 
@@ -120,6 +122,8 @@ class Pipeline:
             relevel_titles: Whether to rebuild headings in OCR.
             concatenate_pages: Whether to concatenate pages.
             cleanup: Whether to remove intermediate files.
+            keep_images: Whether to keep images folder in output (default True).
+            embed_base64: Whether to embed images as base64 in markdown (default False).
 
         Returns:
             A dictionary with paths to output files.
@@ -177,11 +181,26 @@ class Pipeline:
         enhanced_folder = base_folder / "enhanced"
         enhanced_folder.mkdir(parents=True, exist_ok=True)
 
+        # Handle images folder
+        raw_images_dir = raw_folder / "imgs"
+        enhanced_images_dir = enhanced_folder / "imgs"
+
+        if keep_images and raw_images_dir.exists():
+            if enhanced_images_dir.exists():
+                shutil.rmtree(enhanced_images_dir)
+            shutil.copytree(raw_images_dir, enhanced_images_dir)
+
         outputs = {}
 
         if format in ("markdown", "both"):
             md_output = enhanced_folder / "document.md"
-            export_to_markdown(tokens, str(md_output))
+            images_dir = str(enhanced_images_dir) if keep_images else None
+            export_to_markdown(
+                tokens,
+                str(md_output),
+                embed_base64=embed_base64,
+                images_dir=images_dir,
+            )
             outputs["markdown"] = str(md_output)
 
         if format in ("json", "both"):

@@ -16,6 +16,10 @@
 
 ---
 
+[English](./README.md) | [中文](./README_CN.md)
+
+---
+
 ## 什么是 Chinvat？
 
 Chinvat 希望解决 PDF 格式 与 AI Agent 之间的鸿沟。PDF 是为人类阅读设计的固定版面格式，而 AI Agent 需要的是结构化、语义明确的文本。
@@ -37,6 +41,7 @@ Chinvat 采用以下技术栈：
 | **多格式输出** | 支持 Markdown、JSON、Structured 格式 |
 | **批量处理** | 高效处理多个 PDF 文件 |
 | **灵活流水线** | 可运行完整流程或单独步骤 |
+| **Base64 嵌入** | 将图片嵌入为 base64 数据 URL，单文件便携 |
 
 ## 快速开始
 
@@ -46,6 +51,9 @@ pip install -e .
 
 # 转换 PDF
 chinvat pipeline document.pdf output/
+
+# 嵌入图片为 base64（单个便携文件）
+chinvat pipeline document.pdf output/ --embed-base64
 
 # 或作为 Python 库使用
 python -c "
@@ -91,6 +99,22 @@ chinvat md enhance input.md output.md     # 增强 AST
 chinvat md export input.md out --format json  # 导出
 ```
 
+### 输出选项
+
+```bash
+# 保留图片文件夹（默认：启用）
+chinvat pipeline input.pdf output/ --keep-images
+
+# 不保留图片文件夹
+chinvat pipeline input.pdf output/ --no-keep-images
+
+# 嵌入图片为 base64（单个便携 markdown 文件）
+chinvat pipeline input.pdf output/ --embed-base64
+
+# 组合使用
+chinvat pipeline input.pdf output/ --embed-base64 --no-keep-images
+```
+
 ### Python API
 
 ```python
@@ -108,7 +132,9 @@ pipeline = Pipeline(
 outputs = pipeline.run(
     input_path="document.pdf",
     output_folder="output",
-    format="both"  # markdown, json, structured, 或 both
+    format="both",  # markdown, json, structured, 或 both
+    keep_images=True,  # 保留 imgs 文件夹
+    embed_base64=False,  # 设为 True 生成单文件
 )
 
 # 批量处理
@@ -127,8 +153,13 @@ output/
 └── document_name/
     └── enhanced/
         ├── document.md     # 增强后的 Markdown
-        └── document.json   # JSON AST（可选）
+        ├── document.json   # JSON AST（可选）
+        └── imgs/          # 提取的图片（可选）
+            ├── image1.jpg
+            └── image2.jpg
 ```
+
+使用 `--embed-base64` 时，图片将直接以 base64 数据 URL 形式嵌入到 markdown 文件中。
 
 ## 技术架构
 
@@ -178,6 +209,9 @@ PDF 文档
 ```bash
 chinvat pipeline input.pdf output/ \
   --format markdown|json|structured|both \
+  --keep-images \           # 保留图片文件夹（默认）
+  --no-keep-images \        # 不保留图片文件夹
+  --embed-base64 \          # 嵌入图片为 base64
   --no-enhance \
   --no-fix-headings \
   --no-filter-decorative \

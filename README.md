@@ -10,9 +10,13 @@
 
 Convert PDFs to enhanced, AI-agent-ready Markdown/JSON documents.
 
-[Features](#features) • [Quick Start](#quick-start) • [Installation](#installation) • [Documentation](#documentation)
+[Features](#features) • [Quick Start](#quick-start) • [Installation](#installation) • [Usage](#usage)
 
 </div>
+
+---
+
+[English](./README.md) | [中文](./README_CN.md)
 
 ---
 
@@ -35,6 +39,7 @@ Chinvat bridges the gap between PDFs designed for human reading and the structur
 | **Multi-Format Output** | Export to Markdown, JSON, or structured data |
 | **Batch Processing** | Efficiently process multiple PDFs |
 | **Flexible Pipeline** | Run full pipeline or individual steps |
+| **Base64 Embedding** | Embed images as base64 data URLs in markdown |
 
 ## Quick Start
 
@@ -44,6 +49,9 @@ pip install -e .
 
 # Convert a PDF
 chinvat pipeline document.pdf output/
+
+# Embed images as base64 (single portable file)
+chinvat pipeline document.pdf output/ --embed-base64
 
 # Or use as a Python library
 python -c "
@@ -89,6 +97,22 @@ chinvat md enhance input.md output.md     # Enhance AST
 chinvat md export input.md out --format json  # Export
 ```
 
+### Output Options
+
+```bash
+# Keep images folder (default: enabled)
+chinvat pipeline input.pdf output/ --keep-images
+
+# Disable images folder
+chinvat pipeline input.pdf output/ --no-keep-images
+
+# Embed images as base64 (single portable markdown file)
+chinvat pipeline input.pdf output/ --embed-base64
+
+# Combine options
+chinvat pipeline input.pdf output/ --embed-base64 --no-keep-images
+```
+
 ### Python API
 
 ```python
@@ -106,7 +130,9 @@ pipeline = Pipeline(
 outputs = pipeline.run(
     input_path="document.pdf",
     output_folder="output",
-    format="both"  # markdown, json, structured, or both
+    format="both",  # markdown, json, structured, or both
+    keep_images=True,  # keep imgs folder
+    embed_base64=False,  # or True for single file
 )
 
 # Batch processing
@@ -125,8 +151,13 @@ output/
 └── document_name/
     └── enhanced/
         ├── document.md     # Enhanced Markdown
-        └── document.json   # JSON AST (optional)
+        ├── document.json   # JSON AST (optional)
+        └── imgs/          # Extracted images (optional)
+            ├── image1.jpg
+            └── image2.jpg
 ```
+
+With `--embed-base64`, images are embedded directly in the markdown file as base64 data URLs.
 
 ## Architecture
 
@@ -180,6 +211,8 @@ chinvat pipeline input.pdf output/ \
   --no-fix-headings \
   --no-filter-decorative \
   --no-enrich-images \
+  --keep-images \
+  --embed-base64 \
   --dummy  # Test without API calls
 ```
 
@@ -212,7 +245,7 @@ chinvat/
 │   ├── image_analyzer.py # VLM image analysis
 │   ├── ast_handler.py    # AST manipulation
 │   ├── enhancement.py    # AST enhancement
-│   └── exporters.py     # Export utilities
+│   └── exporters.py       # Export utilities
 ├── pyproject.toml        # Package configuration
 ├── README.md             # English documentation
 ├── README_CN.md          # 中文文档
