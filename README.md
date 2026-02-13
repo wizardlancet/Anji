@@ -159,38 +159,14 @@ output/
 
 With `--embed-base64`, images are embedded directly in the markdown file as base64 data URLs.
 
-## Architecture
+## How It Works
 
-```
-PDF Document
-     │
-     ▼
-┌─────────────────┐
-│ 1. PDF → Markdown │  PaddleOCR-VL
-│    (pdf_converter.py) │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ 2. Markdown → AST │  Mistune
-│     (ast_handler.py)  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ 3. Enhance AST   │  Image Analysis + Filtering
-│ (enhancement.py) │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ 4. Export        │  Markdown / JSON / Structured
-│   (exporters.py) │
-└─────────────────┘
-         │
-         ▼
-   AI-Ready Output
-```
+Chinvat processes PDFs through 4 stages:
+
+1. **PDF → Markdown** - Uses PaddleOCR-VL to extract text, tables, and images
+2. **Markdown → AST** - Parses markdown into an abstract syntax tree using Mistune
+3. **Enhance** - Analyzes images with VLM, fixes heading levels, filters decorative elements
+4. **Export** - Outputs as Markdown, JSON, or structured data
 
 ## Configuration
 
@@ -245,13 +221,12 @@ chinvat/
 │   ├── image_analyzer.py # VLM image analysis
 │   ├── ast_handler.py    # AST manipulation
 │   ├── enhancement.py    # AST enhancement
-│   └── exporters.py       # Export utilities
+│   └── exporters.py      # Export utilities
 ├── pyproject.toml        # Package configuration
 ├── README.md             # English documentation
-├── README_CN.md          # 中文文档
+├── README_CN.md          # Chinese documentation
 ├── CLAUDE.md             # Claude Code context
-├── .gitignore
-└── references/           # Reference implementations
+└── .gitignore
 ```
 
 ## License

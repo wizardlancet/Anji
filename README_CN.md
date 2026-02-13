@@ -161,38 +161,14 @@ output/
 
 使用 `--embed-base64` 时，图片将直接以 base64 数据 URL 形式嵌入到 markdown 文件中。
 
-## 技术架构
+## 工作原理
 
-```
-PDF 文档
-     │
-     ▼
-┌─────────────────┐
-│ 1. PDF → Markdown │  PaddleOCR-VL
-│    (pdf_converter.py) │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ 2. Markdown → AST │  Mistune
-│     (ast_handler.py)  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ 3. 增强 AST       │  图像分析 + 内容过滤
-│ (enhancement.py) │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ 4. 导出          │  Markdown / JSON / Structured
-│   (exporters.py) │
-└─────────────────┘
-         │
-         ▼
-   AI-Ready 输出
-```
+Chinvat 通过 4 个阶段处理 PDF：
+
+1. **PDF → Markdown** - 使用 PaddleOCR-VL 提取文本、表格和图片
+2. **Markdown → AST** - 使用 Mistune 将 markdown 解析为抽象语法树
+3. **增强** - 使用 VLM 分析图片，修正标题层级，过滤装饰元素
+4. **导出** - 输出为 Markdown、JSON 或结构化数据
 
 ## 配置说明
 
@@ -253,8 +229,7 @@ chinvat/
 ├── README.md            # 英文文档
 ├── README_CN.md         # 中文文档
 ├── CLAUDE.md            # Claude Code 上下文
-├── .gitignore
-└── references/          # 参考实现
+└── .gitignore
 ```
 
 ## 许可证
