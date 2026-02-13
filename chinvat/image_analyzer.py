@@ -226,11 +226,18 @@ class ImageAnalyzer:
 
             return (str(image_path), result)
 
-    async def _call_vlm(self, image_data_url: str) -> Optional[dict]:
+    async def _call_vlm(
+        self, 
+        image_data_url: str, 
+        enable_thinking: bool = False, 
+        max_tokens: int = 2048
+    ) -> Optional[dict]:
         """Call the VLM model to analyze an image.
 
         Args:
             image_data_url: The image data URL.
+            enable_thinking: Whether to enable thinking mode.
+            max_tokens: Maximum number of tokens for the response.
 
         Returns:
             Analysis result dictionary, or None on failure.
@@ -248,7 +255,12 @@ class ImageAnalyzer:
                             ],
                         }
                     ],
-                    max_tokens=1024,
+                    max_tokens=max_tokens,
+                    extra_body={
+                    "chat_template_kwargs": {
+                        "enable_thinking": enable_thinking,
+                    },
+                },
                 )
                 content = resp.choices[0].message.content
                 result = self._extract_json(content)
