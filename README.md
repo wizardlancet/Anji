@@ -72,12 +72,34 @@ pip install -e ".[dev]"
 
 ### Prerequisites
 
-Chinvat requires two external services:
+Chinvat requires two external services running:
 
-1. **PaddleOCR-VL Server** (port 8118)
-2. **Ovis2.5-9B VLM Server** (port 8000)
+#### 1. PaddleOCR-VL Server (port 8118)
 
-See [references/readme.md](references/readme.md) for setup instructions.
+Requires GPU. Run using Docker:
+
+```bash
+docker run \
+    -it \
+    --rm \
+    --gpus all \
+    --network host \
+    ccr-2vdh3abv-pub.cnc.bj.baidubce.com/paddlepaddle/paddleocr-genai-vllm-server:latest-nvidia-gpu \
+    paddleocr genai_server --model_name PaddleOCR-VL-1.5-0.9B --host 0.0.0.0 --port 8118 --backend vllm
+```
+
+#### 2. Ovis2.5-9B VLM Server (port 8000)
+
+Requires GPU with ~16GB VRAM. Run with vLLM:
+
+```bash
+vllm serve AIDC-AI/Ovis2.5-9B \
+    --trust-remote-code \
+    --port 8000 \
+    --gpu-memory-utilization 0.4
+```
+
+> **Note:** If you encounter `RuntimeError: Exception from the 'vlm' worker: only 0-dimensional arrays can be converted to Python scalars`, install `numpy==1.26.4`.
 
 ## Usage
 

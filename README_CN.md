@@ -76,10 +76,32 @@ pip install -e ".[dev]"
 
 Chinvat 需要运行两个外部服务：
 
-1. **PaddleOCR-VL 服务器**（端口 8118）
-2. **Ovis2.5-9B VLM 服务器**（端口 8000）
+#### 1. PaddleOCR-VL 服务器（端口 8118）
 
-详细配置说明请参考 [references/readme.md](references/readme.md)。
+需要 GPU。使用 Docker 运行：
+
+```bash
+docker run \
+    -it \
+    --rm \
+    --gpus all \
+    --network host \
+    ccr-2vdh3abv-pub.cnc.bj.baidubce.com/paddlepaddle/paddleocr-genai-vllm-server:latest-nvidia-gpu \
+    paddleocr genai_server --model_name PaddleOCR-VL-1.5-0.9B --host 0.0.0.0 --port 8118 --backend vllm
+```
+
+#### 2. Ovis2.5-9B VLM 服务器（端口 8000）
+
+需要 GPU，约 16GB 显存。使用 vLLM 运行：
+
+```bash
+vllm serve AIDC-AI/Ovis2.5-9B \
+    --trust-remote-code \
+    --port 8000 \
+    --gpu-memory-utilization 0.4
+```
+
+> **注意：** 如果遇到 `RuntimeError: Exception from the 'vlm' worker: only 0-dimensional arrays can be converted to Python scalars`，请安装 `numpy==1.26.4`。
 
 ## 使用文档
 
