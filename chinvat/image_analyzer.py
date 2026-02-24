@@ -177,12 +177,22 @@ class ImageAnalyzer:
         if self.dummy_mode:
             return {str(p): DUMMY_RESPONSE.copy() for p in image_paths}
 
-        sem = asyncio.Semaphore(self.max_concurrency)
-        tasks = [
-            self._process_image(sem, p, save_json=save_json)
-            for p in image_paths
-        ]
-        results = await asyncio.gather(*tasks)
+        # Create client locally to avoid cross-event-loop issues
+        # when asyncio.run() is called multiple times
+        client = AsyncOpenAI(
+            api_key=self.api_key,
+            base_url=self.api_base_url,
+        )
+
+        try:
+            sem = asyncio.Semaphore(self.max_concurrency)
+            tasks = [
+                self._process_image(sem, p, save_json=save_json, client=client)
+                for p in image_paths
+            ]
+            results = await asyncio.gather(*tasks)
+        finally:
+            await client.close()
 
         return {path: data for r in results if r for path, data in [r]}
 
@@ -191,6 +201,7 @@ class ImageAnalyzer:
         sem: asyncio.Semaphore,
         image_path: Path,
         save_json: bool = True,
+        client: Optional[AsyncOpenAI] = None,
     ) -> Optional[tuple[str, dict]]:
         """Process a single image with concurrency control.
 
@@ -198,6 +209,7 @@ class ImageAnalyzer:
             sem: Semaphore for concurrency control.
             image_path: Path to the image.
             save_json: Whether to save JSON results.
+            client: AsyncOpenAI client to use for API calls.
 
         Returns:
             Tuple of (image path string, analysis result), or None.
@@ -211,7 +223,7 @@ class ImageAnalyzer:
             if not data_url:
                 return None
 
-            result = await self._call_vlm(data_url)
+            result = await self._call_vlm(data_url, client=client)
             if not result:
                 return None
 
@@ -227,10 +239,11 @@ class ImageAnalyzer:
             return (str(image_path), result)
 
     async def _call_vlm(
-        self, 
-        image_data_url: str, 
-        enable_thinking: bool = False, 
-        max_tokens: int = 2048
+        self,
+        image_data_url: str,
+        enable_thinking: bool = False,
+        max_tokens: int = 2048,
+        client: Optional[AsyncOpenAI] = None,
     ) -> Optional[dict]:
         """Call the VLM model to analyze an image.
 
@@ -238,13 +251,17 @@ class ImageAnalyzer:
             image_data_url: The image data URL.
             enable_thinking: Whether to enable thinking mode.
             max_tokens: Maximum number of tokens for the response.
+            client: AsyncOpenAI client to use for API calls.
 
         Returns:
             Analysis result dictionary, or None on failure.
         """
+        # Use provided client or fall back to cached client
+        api_client = client or self.client
+
         for attempt in range(MAX_RETRIES):
             try:
-                resp = await self.client.chat.completions.create(
+                resp = await api_client.chat.completions.create(
                     model=self.model_name,
                     messages=[
                         {
