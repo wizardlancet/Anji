@@ -194,7 +194,10 @@ class Pipeline:
 
         if output_format in ("markdown", "both"):
             md_output = enhanced_folder / "document.md"
-            images_dir = str(enhanced_images_dir) if keep_images else None
+            # Always pass raw_folder for base64 embedding (images exist there even if not copied to enhanced)
+            # When keep_images is True: copy raw imgs to enhanced imgs, use enhanced imgs for base64
+            # When keep_images is False: use raw imgs for base64 (they'll be cleaned up later if cleanup=True)
+            images_dir = str(raw_images_dir) if raw_images_dir.exists() else None
             export_to_markdown(
                 tokens,
                 str(md_output),

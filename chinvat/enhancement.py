@@ -81,12 +81,14 @@ class Enhancer:
         self,
         tokens: list[dict[str, Any]],
         images_dir: Optional[str] = None,
+        precomputed_results: Optional[dict[str, dict]] = None,
     ) -> list[dict[str, Any]]:
         """Filter out decorative images from the AST.
 
         Args:
             tokens: The AST tokens.
             images_dir: Optional directory containing images for analysis.
+            precomputed_results: Optional precomputed image analysis results to avoid duplicate API calls.
 
         Returns:
             The filtered AST tokens.
@@ -103,13 +105,19 @@ class Enhancer:
         if self.image_analyzer and images_dir:
             from pathlib import Path
 
-            image_paths = []
-            for img in images:
-                url = img.get("attrs", {}).get("url", "")
-                if url:
-                    image_paths.append(Path(images_dir) / url)
+            if precomputed_results is not None:
+                # Use precomputed results
+                results = precomputed_results
+            else:
+                # Analyze images if not already done
+                image_paths = []
+                for img in images:
+                    url = img.get("attrs", {}).get("url", "")
+                    if url:
+                        image_paths.append(Path(images_dir) / url)
 
-            results = asyncio.run(self.image_analyzer.analyze_images(image_paths))
+                results = asyncio.run(self.image_analyzer.analyze_images(image_paths))
+
             for path, result in results.items():
                 # path is a string from the dict key
                 path_obj = Path(path)
@@ -159,33 +167,40 @@ class Enhancer:
         tokens: list[dict[str, Any]],
         images_dir: Optional[str] = None,
         update_content: bool = False,
-    ) -> list[dict[str, Any]]:
+        precomputed_results: Optional[dict[str, dict]] = None,
+    ) -> tuple[list[dict[str, Any]], dict[str, dict]]:
         """Enrich image nodes with analysis results.
 
         Args:
             tokens: The AST tokens.
             images_dir: Optional directory containing images.
             update_content: Whether to update image children with captions.
+            precomputed_results: Optional precomputed image analysis results to avoid duplicate API calls.
 
         Returns:
-            The enhanced AST tokens.
+            A tuple of (enhanced AST tokens, analysis results dict).
         """
         import asyncio
 
         images = self.ast_handler.find_images(tokens)
 
         if not images or not self.image_analyzer or not images_dir:
-            return tokens
+            return tokens, {}
 
         from pathlib import Path
 
-        image_paths = []
-        for img in images:
-            url = img.get("attrs", {}).get("url", "")
-            if url:
-                image_paths.append(Path(images_dir) / url)
+        if precomputed_results is not None:
+            # Use precomputed results
+            results = precomputed_results
+        else:
+            # Analyze images if not already done
+            image_paths = []
+            for img in images:
+                url = img.get("attrs", {}).get("url", "")
+                if url:
+                    image_paths.append(Path(images_dir) / url)
 
-        results = asyncio.run(self.image_analyzer.analyze_images(image_paths))
+            results = asyncio.run(self.image_analyzer.analyze_images(image_paths))
 
         # Update AST tokens with analysis results
         for token in images:
@@ -213,7 +228,7 @@ class Enhancer:
                 if update_content and "caption" in result:
                     token["children"] = [{"type": "text", "raw": result["caption"]}]
 
-        return tokens
+        return tokens, results
 
     def enhance(
         self,
@@ -235,14 +250,50 @@ class Enhancer:
         Returns:
             The enhanced AST tokens.
         """
+        import asyncio
+        from pathlib import Path
+
+        # Determine if we need image analysis
+        needs_analysis = (
+            self.image_analyzer
+            and images_dir
+            and (enrich_images or filter_decorative)
+        )
+
+        # Precompute image analysis results once to avoid duplicate API calls
+        precomputed_results: dict[str, dict] = {}
+        if needs_analysis:
+            images = self.ast_handler.find_images(tokens)
+            if images:
+                image_paths = []
+                for img in images:
+                    url = img.get("attrs", {}).get("url", "")
+                    if url:
+                        image_paths.append(Path(images_dir) / url)
+
+                if image_paths:
+                    precomputed_results = asyncio.run(
+                        self.image_analyzer.analyze_images(image_paths)
+                    )
+
         # Step 1: Enrich images with analysis (needs to happen before filtering)
-        if enrich_images and self.image_analyzer:
-            tokens = self.enrich_images_with_analysis(
+        if enrich_images and precomputed_results:
+            tokens, _ = self.enrich_images_with_analysis(
+                tokens, images_dir, update_content=False, precomputed_results=precomputed_results
+            )
+        elif enrich_images and self.image_analyzer:
+            # Fallback: analyze if not done yet (for backward compatibility)
+            tokens, _ = self.enrich_images_with_analysis(
                 tokens, images_dir, update_content=False
             )
 
         # Step 2: Filter decorative images
-        if filter_decorative and self.image_analyzer:
+        if filter_decorative and precomputed_results:
+            tokens = self.filter_decorative_images(
+                tokens, images_dir, precomputed_results=precomputed_results
+            )
+        elif filter_decorative and self.image_analyzer:
+            # Fallback: analyze if not done yet (for backward compatibility)
             tokens = self.filter_decorative_images(tokens, images_dir)
 
         # Step 3: Fix heading levels
