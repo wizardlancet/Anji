@@ -63,13 +63,13 @@ def embed_images_as_base64(markdown: str, images_dir: str) -> str:
         Markdown with images embedded as base64.
     """
 
-    def replace_image(match):
-        alt_text = match.group(1)
+    def replace_image(match: re.Match) -> str:
+        alt_text: str = match.group(1)
         image_path = match.group(2)
 
         # Skip if already base64 or URL
         if image_path.startswith(("http://", "https://", "data:")):
-            return match.group(0)
+            return match.group(0)  # type: ignore[no-any-return]
 
         # Try to find the image file
         # Handle both relative paths (imgs/xxx.jpg) and absolute paths
@@ -112,7 +112,7 @@ def embed_images_as_base64(markdown: str, images_dir: str) -> str:
             except Exception as e:
                 print(f"Warning: Failed to embed image {full_path}: {e}")
 
-        return match.group(0)
+        return match.group(0)  # type: ignore[no-any-return]
 
     return MD_IMG_PATTERN.sub(replace_image, markdown)
 
@@ -207,7 +207,7 @@ def export_to_structured_data(
     Returns:
         A dictionary containing structured document data.
     """
-    structure = {
+    structure: dict[str, Any] = {
         "title": "",
         "headings": [],
         "content_blocks": [],
@@ -215,7 +215,7 @@ def export_to_structured_data(
         "tables": [],
     }
 
-    current_section = {"level": 0, "title": "", "content": []}
+    current_section: dict[str, Any] = {"level": 0, "title": "", "content": []}
 
     for token in tokens:
         if token["type"] == "heading":
@@ -344,15 +344,15 @@ def export_document(
     Returns:
         The path to the output file.
     """
-    output_path = Path(output_path)
+    output_path_obj = Path(output_path)
 
     if output_format == "markdown":
-        export_to_markdown(tokens, str(output_path))
+        export_to_markdown(tokens, str(output_path_obj))
     elif output_format == "json":
-        export_to_json(tokens, str(output_path))
+        export_to_json(tokens, str(output_path_obj))
     elif output_format == "structured":
-        export_to_structured_data(tokens, str(output_path))
+        export_to_structured_data(tokens, str(output_path_obj))
     else:
         raise ValueError(f"Unsupported format: {output_format}")
 
-    return str(output_path)
+    return str(output_path_obj)

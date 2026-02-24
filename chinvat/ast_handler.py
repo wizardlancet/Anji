@@ -6,7 +6,7 @@ rendering AST back to Markdown.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Optional, cast
 import mistune
 
 
@@ -22,7 +22,7 @@ class MarkdownAST:
         >>> rendered = md_ast.render(tokens)
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create a MarkdownAST handler."""
         self._md = mistune.create_markdown(renderer=None)
 
@@ -40,7 +40,7 @@ class MarkdownAST:
             >>> tokens[0]
             {'type': 'heading', 'attrs': {'level': 1}, ...}
         """
-        return self._md(markdown)
+        return cast(list[dict[str, Any]], self._md(markdown))
 
     def find_images(
         self,
@@ -244,7 +244,7 @@ def _render_block_token(token: dict[str, Any]) -> str:
         return "---"
 
     elif t == "block_html":
-        return token.get("raw", "").strip()
+        return token.get("raw", "").strip()  # type: ignore[no-any-return]
 
     elif t == "block_text":
         return render_inline(token.get("children", []))
@@ -257,7 +257,7 @@ def _render_block_token(token: dict[str, Any]) -> str:
 
     else:
         if "raw" in token:
-            return token["raw"].strip()
+            return token["raw"].strip()  # type: ignore[no-any-return]
         if "children" in token:
             return render_inline(token["children"])
         return ""
@@ -296,7 +296,7 @@ def _render_table(token: dict[str, Any]) -> str:
         The rendered table.
     """
     if "raw" in token:
-        return token["raw"] + "\n"
+        return token["raw"] + "\n"  # type: ignore[no-any-return]
     return ""
 
 

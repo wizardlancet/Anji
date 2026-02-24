@@ -612,7 +612,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
 
 
-def _run_pipeline(args) -> int:
+def _run_pipeline(args: argparse.Namespace) -> int:
     """Run the full pipeline."""
     pipeline = Pipeline(
         paddleocr_server_url=args.paddleocr_url,
@@ -648,7 +648,7 @@ def _run_pipeline(args) -> int:
     return 0
 
 
-def _run_batch(args) -> int:
+def _run_batch(args: argparse.Namespace) -> int:
     """Run batch processing."""
     input_files = list(args.input_files or [])
 
@@ -700,7 +700,7 @@ def _run_batch(args) -> int:
     return 0
 
 
-def _run_pdf(args) -> int:
+def _run_pdf(args: argparse.Namespace) -> int:
     """Run PDF conversion only."""
     converter = PDFToMarkdownConverter(server_url=args.paddleocr_url)
     converter.convert(
@@ -712,7 +712,7 @@ def _run_pdf(args) -> int:
     return 0
 
 
-def _run_md(args) -> int:
+def _run_md(args: argparse.Namespace) -> int:
     """Run Markdown processing."""
     if args.md_command == "parse":
         ast_handler = MarkdownAST()
@@ -771,7 +771,7 @@ def _run_md(args) -> int:
     return 0
 
 
-def _run_image(args) -> int:
+def _run_image(args: argparse.Namespace) -> int:
     """Run image analysis only."""
     analyzer = ImageAnalyzer(
         api_base_url=args.vlm_url,

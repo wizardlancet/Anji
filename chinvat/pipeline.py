@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from chinvat.pdf_converter import (
     PDFToMarkdownConverter,
@@ -197,12 +197,12 @@ class Pipeline:
             # Always pass raw_folder for base64 embedding (images exist there even if not copied to enhanced)
             # When keep_images is True: copy raw imgs to enhanced imgs, use enhanced imgs for base64
             # When keep_images is False: use raw imgs for base64 (they'll be cleaned up later if cleanup=True)
-            images_dir = str(raw_images_dir) if raw_images_dir.exists() else None
+            export_images_dir: Optional[str] = str(raw_images_dir) if raw_images_dir.exists() else None
             export_to_markdown(
                 tokens,
                 str(md_output),
                 embed_base64=embed_base64,
-                images_dir=images_dir,
+                images_dir=export_images_dir,
             )
             outputs["markdown"] = str(md_output)
 
@@ -228,7 +228,7 @@ class Pipeline:
         input_paths: list[Union[str, Path]],
         output_base_folder: Union[str, Path],
         auto_naming: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> list[dict[str, str]]:
         """Run the pipeline on multiple PDFs.
 
@@ -276,7 +276,7 @@ def run_full_pipeline(
     output_folder: Union[str, Path],
     paddleocr_server_url: str = "http://localhost:8118/v1",
     vlm_server_url: str = "http://localhost:8000/v1",
-    **kwargs,
+    **kwargs: Any,
 ) -> dict[str, str]:
     """Convenience function to run the full pipeline.
 
@@ -306,7 +306,7 @@ def batch_pipeline(
     paddleocr_server_url: str = "http://localhost:8118/v1",
     vlm_server_url: str = "http://localhost:8000/v1",
     auto_naming: bool = True,
-    **kwargs,
+    **kwargs: Any,
 ) -> list[dict[str, str]]:
     """Convenience function to run the pipeline on multiple PDFs.
 

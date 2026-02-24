@@ -280,6 +280,8 @@ class ImageAnalyzer:
                 },
                 )
                 content = resp.choices[0].message.content
+                if content is None:
+                    continue
                 result = self._extract_json(content)
                 if result:
                     return result
@@ -331,7 +333,7 @@ class ImageAnalyzer:
         text = re.sub(r"\s*```$", "", text)
 
         try:
-            return json.loads(text)
+            return json.loads(text)  # type: ignore[no-any-return]
         except json.JSONDecodeError:
             pass
 
@@ -347,7 +349,7 @@ class ImageAnalyzer:
                 depth -= 1
                 if depth == 0:
                     try:
-                        return json.loads(text[start : i + 1])
+                        return json.loads(text[start : i + 1])  # type: ignore[no-any-return]
                     except json.JSONDecodeError:
                         return None
         return None
@@ -390,25 +392,25 @@ def update_markdown_images(
     """
     norm_results = {normalize_path(k): v for k, v in results.items()}
 
-    def replace_md_img(m):
+    def replace_md_img(m: re.Match) -> str:
         alt, path = m.group(1), m.group(2)
         norm_path = normalize_path(path)
         if norm_path in norm_results and "caption" in norm_results[norm_path]:
             caption = norm_results[norm_path]["caption"].replace("]", "\\]")
             return f"![{caption}]({path})"
-        return m.group(0)
+        return m.group(0)  # type: ignore[no-any-return]
 
-    def replace_html_img(m):
+    def replace_html_img(m: re.Match) -> str:
         full_match = m.group(0)
         src = m.group(1)
         norm_src = normalize_path(src)
         if norm_src in norm_results and "caption" in norm_results[norm_src]:
             caption = norm_results[norm_src]["caption"].replace('"', "&quot;")
             if re.search(r'\balt=["\']', full_match, re.IGNORECASE):
-                return re.sub(r'\balt=["\'][^"\']*["\']', f'alt="{caption}"', full_match)
+                return re.sub(r'\balt=["\'][^"\']*["\']', f'alt="{caption}"', full_match)  # type: ignore[no-any-return]
             else:
-                return full_match.replace("<img ", f'<img alt="{caption}" ', 1)
-        return full_match
+                return full_match.replace("<img ", f'<img alt="{caption}" ', 1)  # type: ignore[no-any-return]
+        return full_match  # type: ignore[no-any-return]
 
     content = MD_IMG_PATTERN.sub(replace_md_img, content)
     content = HTML_IMG_PATTERN.sub(replace_html_img, content)
@@ -500,7 +502,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         dummy_mode=args.dummy,
     )
 
-    results = analyzer.analyze_images([Path(p) for p in image_paths])
+    results = asyncio.run(analyzer.analyze_images([Path(p) for p in image_paths]))
 
     if results:
         new_content = update_markdown_images(content, results)

@@ -264,14 +264,14 @@ class Enhancer:
         precomputed_results: dict[str, dict] = {}
         if needs_analysis:
             images = self.ast_handler.find_images(tokens)
-            if images:
+            if images and images_dir:
                 image_paths = []
                 for img in images:
                     url = img.get("attrs", {}).get("url", "")
                     if url:
                         image_paths.append(Path(images_dir) / url)
 
-                if image_paths:
+                if image_paths and self.image_analyzer:
                     precomputed_results = asyncio.run(
                         self.image_analyzer.analyze_images(image_paths)
                     )

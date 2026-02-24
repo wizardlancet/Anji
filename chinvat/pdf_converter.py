@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 if TYPE_CHECKING:
     from paddleocr import PaddleOCRVL
@@ -193,7 +193,7 @@ def batch_pdf_to_markdown(
     input_paths: list[Union[str, Path]],
     output_base_folder: Union[str, Path],
     auto_naming: bool = True,
-    **kwargs,
+    **kwargs: Any,
 ) -> list[str]:
     """Batch convert multiple PDF files to Markdown.
 
@@ -212,7 +212,7 @@ def batch_pdf_to_markdown(
         ['./outputs/doc1', './outputs/doc2', './outputs/doc3']
     """
     output_base = Path(output_base_folder)
-    results = []
+    results: list[str] = []
     converter = get_default_converter(**kwargs)
 
     for input_path in input_paths:
