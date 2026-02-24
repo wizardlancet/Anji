@@ -332,27 +332,27 @@ def _extract_list_items(token: dict[str, Any]) -> list[str]:
 def export_document(
     tokens: list[dict[str, Any]],
     output_path: str,
-    format: str = "markdown",
+    output_format: str = "markdown",
 ) -> str:
     """Export a document in the specified format.
 
     Args:
         tokens: The AST tokens.
         output_path: Path to save the output file.
-        format: Output format ('markdown', 'json', 'structured').
+        output_format: Output format ('markdown', 'json', 'structured').
 
     Returns:
         The path to the output file.
     """
     output_path = Path(output_path)
 
-    if format == "markdown":
+    if output_format == "markdown":
         export_to_markdown(tokens, str(output_path))
-    elif format == "json":
+    elif output_format == "json":
         export_to_json(tokens, str(output_path))
-    elif format == "structured":
+    elif output_format == "structured":
         export_to_structured_data(tokens, str(output_path))
     else:
-        raise ValueError(f"Unsupported format: {format}")
+        raise ValueError(f"Unsupported format: {output_format}")
 
     return str(output_path)

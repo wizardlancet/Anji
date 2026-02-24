@@ -623,7 +623,7 @@ def _run_pipeline(args) -> int:
         results = pipeline.run(
             input_path=args.input,
             output_folder=args.output,
-            format=args.format,
+            output_format=args.format,
             enhance=not args.no_enhance if hasattr(args, "no_enhance") else True,
             fix_headings=not args.no_fix_headings if hasattr(args, "no_fix_headings") else True,
             filter_decorative=not args.no_filter_decorative if hasattr(args, "no_filter_decorative") else True,
@@ -676,7 +676,7 @@ def _run_batch(args) -> int:
         results = pipeline.run_batch(
             input_paths=input_files,
             output_base_folder=args.output_base,
-            format=args.format,
+            output_format=args.format,
             auto_naming=not args.no_auto_naming,
             enhance=not args.no_enhance if hasattr(args, "no_enhance") else True,
             fix_headings=not args.no_fix_headings if hasattr(args, "no_fix_headings") else True,

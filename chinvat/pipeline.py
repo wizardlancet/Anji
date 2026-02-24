@@ -42,7 +42,7 @@ class Pipeline:
         ...     paddleocr_server_url="http://localhost:8118/v1",
         ...     vlm_server_url="http://localhost:8000/v1",
         ... )
-        >>> pipeline.run("input.pdf", "output_dir", format="json")
+        >>> pipeline.run("input.pdf", "output_dir", output_format="json")
     """
 
     def __init__(
@@ -96,7 +96,7 @@ class Pipeline:
         self,
         input_path: Union[str, Path],
         output_folder: Union[str, Path],
-        format: str = "markdown",
+        output_format: str = "markdown",
         enhance: bool = True,
         fix_headings: bool = True,
         filter_decorative: bool = True,
@@ -113,7 +113,7 @@ class Pipeline:
         Args:
             input_path: Path to the input PDF.
             output_folder: Path to the output folder.
-            format: Output format ('markdown', 'json', 'structured').
+            output_format: Output format ('markdown', 'json', 'structured').
             enhance: Whether to apply enhancements.
             fix_headings: Whether to fix heading levels.
             filter_decorative: Whether to filter decorative images.
@@ -177,7 +177,7 @@ class Pipeline:
             )
 
         # Step 4: Export to output format
-        print(f"[4/4] Exporting to {format}")
+        print(f"[4/4] Exporting to {output_format}")
         enhanced_folder = base_folder / "enhanced"
         enhanced_folder.mkdir(parents=True, exist_ok=True)
 
@@ -192,7 +192,7 @@ class Pipeline:
 
         outputs = {}
 
-        if format in ("markdown", "both"):
+        if output_format in ("markdown", "both"):
             md_output = enhanced_folder / "document.md"
             images_dir = str(enhanced_images_dir) if keep_images else None
             export_to_markdown(
@@ -203,12 +203,12 @@ class Pipeline:
             )
             outputs["markdown"] = str(md_output)
 
-        if format in ("json", "both"):
+        if output_format in ("json", "both"):
             json_output = enhanced_folder / "document.json"
             export_to_json(tokens, str(json_output))
             outputs["json"] = str(json_output)
 
-        if format == "structured":
+        if output_format == "structured":
             structured_output = enhanced_folder / "document_structured.json"
             export_to_structured_data(tokens, str(structured_output))
             outputs["structured"] = str(structured_output)

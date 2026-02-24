@@ -152,7 +152,7 @@ pipeline = Pipeline(
 outputs = pipeline.run(
     input_path="document.pdf",
     output_folder="output",
-    format="both",  # markdown, json, structured, or both
+    output_format="both",  # markdown, json, structured, or both
     keep_images=True,  # keep imgs folder
     embed_base64=False,  # or True for single file
 )

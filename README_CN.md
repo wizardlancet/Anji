@@ -154,7 +154,7 @@ pipeline = Pipeline(
 outputs = pipeline.run(
     input_path="document.pdf",
     output_folder="output",
-    format="both",  # markdown, json, structured, 或 both
+    output_format="both",  # markdown, json, structured, 或 both
     keep_images=True,  # 保留 imgs 文件夹
     embed_base64=False,  # 设为 True 生成单文件
 )
