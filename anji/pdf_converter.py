@@ -25,7 +25,7 @@ class PDFToMarkdownConverter:
         >>> converter = PDFToMarkdownConverter()
         >>> converter.convert("input.pdf", "./output")
         >>> # Or use the convenience function
-        >>> from chinvat import pdf_to_markdown
+        >>> from anji import pdf_to_markdown
         >>> pdf_to_markdown("input.pdf", "./output")
     """
 

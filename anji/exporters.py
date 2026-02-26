@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import Any, Optional
 
-from chinvat.ast_handler import MarkdownAST, render_inline
+from anji.ast_handler import MarkdownAST, render_inline
 
 
 # Pattern to match markdown image syntax

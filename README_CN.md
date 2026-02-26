@@ -1,12 +1,12 @@
 <div align="center">
 
-# Chinvat
+# Anji (安济桥)
 
 **PDF 转 AI Agent 知识桥梁**
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://pypi.org/project/chinvat/)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/chinvat/chinvat/blob/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/chinvat)](https://pypi.org/project/chinvat/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://pypi.org/project/anji/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/wizardlancet/Anji/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/anji)](https://pypi.org/project/anji/)
 
 将 PDF 转换为增强的、AI Agent 可读的 Markdown/JSON 文档。
 
@@ -20,11 +20,11 @@
 
 ---
 
-## 什么是 Chinvat？
+## 什么是 Anji？
 
-Chinvat 希望解决 PDF 格式 与 AI Agent 之间的鸿沟。PDF 是为人类阅读设计的固定版面格式，而 AI Agent 需要的是结构化、语义明确的文本。
+Anji 希望解决 PDF 格式 与 AI Agent 之间的鸿沟。PDF 是为人类阅读设计的固定版面格式，而 AI Agent 需要的是结构化、语义明确的文本。
 
-Chinvat 采用以下技术栈：
+Anji 采用以下技术栈：
 
 - **PaddleOCR-VL** - 高质量 PDF 转 Markdown
 - **Ovis2.5-9B 视觉语言模型** - 智能图像分析
@@ -50,14 +50,14 @@ Chinvat 采用以下技术栈：
 pip install -e .
 
 # 转换 PDF
-chinvat pipeline document.pdf output/
+anji pipeline document.pdf output/
 
 # 嵌入图片为 base64（单个便携文件）
-chinvat pipeline document.pdf output/ --embed-base64
+anji pipeline document.pdf output/ --embed-base64
 
 # 或作为 Python 库使用
 python -c "
-from chinvat import run_full_pipeline
+from anji import run_full_pipeline
 run_full_pipeline('document.pdf', 'output/')
 "
 ```
@@ -74,7 +74,7 @@ pip install -e ".[dev]"
 
 ### 前置条件
 
-Chinvat 需要运行两个外部服务：
+Anji 需要运行两个外部服务：
 
 #### 1. PaddleOCR-VL 服务器（端口 8118）
 
@@ -109,38 +109,38 @@ vllm serve AIDC-AI/Ovis2.5-9B \
 
 ```bash
 # 完整流水线
-chinvat pipeline input.pdf output_dir
+anji pipeline input.pdf output_dir
 
 # 批量处理
-chinvat batch output_base file1.pdf file2.pdf file3.pdf
+anji batch output_base file1.pdf file2.pdf file3.pdf
 
 # 单独步骤
-chinvat pdf input.pdf output_dir          # PDF → Markdown
-chinvat image input.md output.md          # 分析图片
-chinvat md enhance input.md output.md     # 增强 AST
-chinvat md export input.md out --format json  # 导出
+anji pdf input.pdf output_dir          # PDF → Markdown
+anji image input.md output.md          # 分析图片
+anji md enhance input.md output.md     # 增强 AST
+anji md export input.md out --format json  # 导出
 ```
 
 ### 输出选项
 
 ```bash
 # 保留图片文件夹（默认：启用）
-chinvat pipeline input.pdf output/ --keep-images
+anji pipeline input.pdf output/ --keep-images
 
 # 不保留图片文件夹
-chinvat pipeline input.pdf output/ --no-keep-images
+anji pipeline input.pdf output/ --no-keep-images
 
 # 嵌入图片为 base64（单个便携 markdown 文件）
-chinvat pipeline input.pdf output/ --embed-base64
+anji pipeline input.pdf output/ --embed-base64
 
 # 组合使用
-chinvat pipeline input.pdf output/ --embed-base64 --no-keep-images
+anji pipeline input.pdf output/ --embed-base64 --no-keep-images
 ```
 
 ### Python API
 
 ```python
-from chinvat import Pipeline, run_full_pipeline, batch_pipeline
+from anji import Pipeline, run_full_pipeline, batch_pipeline
 
 # 简单用法
 run_full_pipeline("document.pdf", "output/")
@@ -185,7 +185,7 @@ output/
 
 ## 工作原理
 
-Chinvat 通过 4 个阶段处理 PDF：
+Anji 通过 4 个阶段处理 PDF：
 
 1. **PDF → Markdown** - 使用 PaddleOCR-VL 提取文本、表格和图片
 2. **Markdown → AST** - 使用 Mistune 将 markdown 解析为抽象语法树
@@ -205,7 +205,7 @@ Chinvat 通过 4 个阶段处理 PDF：
 ### CLI 选项
 
 ```bash
-chinvat pipeline input.pdf output/ \
+anji pipeline input.pdf output/ \
   --format markdown|json|structured|both \
   --keep-images \           # 保留图片文件夹（默认）
   --no-keep-images \        # 不保留图片文件夹
@@ -221,13 +221,13 @@ chinvat pipeline input.pdf output/ \
 
 ```bash
 # 代码格式化
-black chinvat/
+black anji/
 
 # 代码检查
-ruff check chinvat/
+ruff check anji/
 
 # 类型检查
-mypy chinvat/
+mypy anji/
 
 # 运行测试
 pytest
@@ -236,8 +236,8 @@ pytest
 ## 项目结构
 
 ```
-chinvat/
-├── chinvat/              # 主包
+anji/
+├── anji/              # 主包
 │   ├── __init__.py       # 导出接口
 │   ├── main.py           # CLI 入口
 │   ├── cli.py            # 命令行接口

@@ -7,8 +7,8 @@ including heading level fixes, image filtering, and more.
 from __future__ import annotations
 
 from typing import Any, Optional
-from chinvat.ast_handler import MarkdownAST
-from chinvat.image_analyzer import ImageAnalyzer
+from anji.ast_handler import MarkdownAST
+from anji.image_analyzer import ImageAnalyzer
 
 
 class Enhancer:

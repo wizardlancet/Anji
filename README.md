@@ -1,12 +1,12 @@
 <div align="center">
 
-# Chinvat
+# Anji (安济桥)
 
 **PDF to AI Agent Knowledge Bridge**
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://pypi.org/project/chinvat/)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/chinvat/chinvat/blob/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/chinvat)](https://pypi.org/project/chinvat/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://pypi.org/project/anji/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/wizardlancet/Anji/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/anji)](https://pypi.org/project/anji/)
 
 Convert PDFs to enhanced, AI-agent-ready Markdown/JSON documents.
 
@@ -20,9 +20,9 @@ Convert PDFs to enhanced, AI-agent-ready Markdown/JSON documents.
 
 ---
 
-## What is Chinvat?
+## What is Anji?
 
-Chinvat bridges the gap between PDFs designed for human reading and the structured, semantic text that AI agents require. It leverages:
+Anji bridges the gap between PDFs designed for human reading and the structured, semantic text that AI agents require. It leverages:
 
 - **PaddleOCR-VL** for high-quality PDF-to-Markdown conversion
 - **Ovis2.5-9B Vision-Language Model** for intelligent image analysis
@@ -48,14 +48,14 @@ Chinvat bridges the gap between PDFs designed for human reading and the structur
 pip install -e .
 
 # Convert a PDF
-chinvat pipeline document.pdf output/
+anji pipeline document.pdf output/
 
 # Embed images as base64 (single portable file)
-chinvat pipeline document.pdf output/ --embed-base64
+anji pipeline document.pdf output/ --embed-base64
 
 # Or use as a Python library
 python -c "
-from chinvat import run_full_pipeline
+from anji import run_full_pipeline
 run_full_pipeline('document.pdf', 'output/')
 "
 ```
@@ -72,7 +72,7 @@ pip install -e ".[dev]"
 
 ### Prerequisites
 
-Chinvat requires two external services running:
+Anji requires two external services running:
 
 #### 1. PaddleOCR-VL Server (port 8118)
 
@@ -107,38 +107,38 @@ vllm serve AIDC-AI/Ovis2.5-9B \
 
 ```bash
 # Full pipeline
-chinvat pipeline input.pdf output_dir
+anji pipeline input.pdf output_dir
 
 # Batch processing
-chinvat batch output_base file1.pdf file2.pdf file3.pdf
+anji batch output_base file1.pdf file2.pdf file3.pdf
 
 # Individual steps
-chinvat pdf input.pdf output_dir          # PDF → Markdown
-chinvat image input.md output.md          # Analyze images
-chinvat md enhance input.md output.md     # Enhance AST
-chinvat md export input.md out --format json  # Export
+anji pdf input.pdf output_dir          # PDF → Markdown
+anji image input.md output.md          # Analyze images
+anji md enhance input.md output.md     # Enhance AST
+anji md export input.md out --format json  # Export
 ```
 
 ### Output Options
 
 ```bash
 # Keep images folder (default: enabled)
-chinvat pipeline input.pdf output/ --keep-images
+anji pipeline input.pdf output/ --keep-images
 
 # Disable images folder
-chinvat pipeline input.pdf output/ --no-keep-images
+anji pipeline input.pdf output/ --no-keep-images
 
 # Embed images as base64 (single portable markdown file)
-chinvat pipeline input.pdf output/ --embed-base64
+anji pipeline input.pdf output/ --embed-base64
 
 # Combine options
-chinvat pipeline input.pdf output/ --embed-base64 --no-keep-images
+anji pipeline input.pdf output/ --embed-base64 --no-keep-images
 ```
 
 ### Python API
 
 ```python
-from chinvat import Pipeline, run_full_pipeline, batch_pipeline
+from anji import Pipeline, run_full_pipeline, batch_pipeline
 
 # Simple usage
 run_full_pipeline("document.pdf", "output/")
@@ -183,7 +183,7 @@ With `--embed-base64`, images are embedded directly in the markdown file as base
 
 ## How It Works
 
-Chinvat processes PDFs through 4 stages:
+Anji processes PDFs through 4 stages:
 
 1. **PDF → Markdown** - Uses PaddleOCR-VL to extract text, tables, and images
 2. **Markdown → AST** - Parses markdown into an abstract syntax tree using Mistune
@@ -203,7 +203,7 @@ Chinvat processes PDFs through 4 stages:
 ### CLI Options
 
 ```bash
-chinvat pipeline input.pdf output/ \
+anji pipeline input.pdf output/ \
   --format markdown|json|structured|both \
   --no-enhance \
   --no-fix-headings \
@@ -218,13 +218,13 @@ chinvat pipeline input.pdf output/ \
 
 ```bash
 # Code formatting
-black chinvat/
+black anji/
 
 # Linting
-ruff check chinvat/
+ruff check anji/
 
 # Type checking
-mypy chinvat/
+mypy anji/
 
 # Testing
 pytest
@@ -233,8 +233,8 @@ pytest
 ## Project Structure
 
 ```
-chinvat/
-├── chinvat/              # Main package
+anji/
+├── anji/              # Main package
 │   ├── __init__.py       # Exports
 │   ├── main.py           # CLI entry point
 │   ├── cli.py            # Command-line interface

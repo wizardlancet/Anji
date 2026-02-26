@@ -10,14 +10,14 @@ import shutil
 from pathlib import Path
 from typing import Any, Optional, Union
 
-from chinvat.pdf_converter import (
+from anji.pdf_converter import (
     PDFToMarkdownConverter,
     get_default_converter,
 )
-from chinvat.ast_handler import MarkdownAST
-from chinvat.image_analyzer import ImageAnalyzer, get_default_analyzer
-from chinvat.enhancement import Enhancer
-from chinvat.exporters import (
+from anji.ast_handler import MarkdownAST
+from anji.image_analyzer import ImageAnalyzer, get_default_analyzer
+from anji.enhancement import Enhancer
+from anji.exporters import (
     export_to_markdown,
     export_to_json,
     export_to_structured_data,
@@ -25,7 +25,7 @@ from chinvat.exporters import (
 
 
 class Pipeline:
-    """The main Chinvat pipeline for PDF to enhanced document conversion.
+    """The main Anji pipeline for PDF to enhanced document conversion.
 
     This pipeline orchestrates the full conversion process:
     1. PDF -> raw Markdown (using PaddleOCR-VL)

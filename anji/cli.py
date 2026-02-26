@@ -1,4 +1,4 @@
-"""Command-line interface for chinvat.
+"""Command-line interface for anji.
 
 This module provides CLI commands for all pipeline stages and the
 full end-to-end conversion.
@@ -10,12 +10,12 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
-from chinvat.pipeline import Pipeline
-from chinvat.pdf_converter import PDFToMarkdownConverter, main as pdf_main
-from chinvat.ast_handler import MarkdownAST
-from chinvat.image_analyzer import ImageAnalyzer, main as img_main
-from chinvat.enhancement import enhance_markdown
-from chinvat.exporters import (
+from anji.pipeline import Pipeline
+from anji.pdf_converter import PDFToMarkdownConverter, main as pdf_main
+from anji.ast_handler import MarkdownAST
+from anji.image_analyzer import ImageAnalyzer, main as img_main
+from anji.enhancement import enhance_markdown
+from anji.exporters import (
     export_to_markdown,
     export_to_json,
     export_to_structured_data,
@@ -41,7 +41,7 @@ def add_common_args(parser: argparse.ArgumentParser) -> None:
 def build_pipeline_parser() -> argparse.ArgumentParser:
     """Build the pipeline subcommand parser."""
     parser = argparse.ArgumentParser(
-        description="Run the full chinvat pipeline",
+        description="Run the full anji pipeline",
     )
     add_common_args(parser)
 
@@ -264,8 +264,8 @@ def build_markdown_parser() -> argparse.ArgumentParser:
 def build_parser() -> argparse.ArgumentParser:
     """Build the main CLI parser."""
     parser = argparse.ArgumentParser(
-        prog="chinvat",
-        description="Chinvat - PDF to AI Agent Knowledge Bridge",
+        prog="anji",
+        description="Anji (安济桥) - PDF to AI Agent Knowledge Bridge",
     )
 
     parser.add_argument(

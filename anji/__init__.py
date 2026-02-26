@@ -1,4 +1,4 @@
-"""Chinvat - PDF to AI Agent Knowledge Bridge
+"""Anji (安济桥) - PDF to AI Agent Knowledge Bridge
 
 A Python package for converting PDFs to enhanced Markdown/JSON,
 optimized for AI agent consumption.
@@ -6,12 +6,12 @@ optimized for AI agent consumption.
 
 __version__ = "0.1.0"
 
-from chinvat.pipeline import Pipeline, run_full_pipeline, batch_pipeline
-from chinvat.pdf_converter import PDFToMarkdownConverter, get_default_converter
-from chinvat.ast_handler import MarkdownAST
-from chinvat.image_analyzer import ImageAnalyzer, get_default_analyzer
-from chinvat.enhancement import Enhancer
-from chinvat.exporters import export_to_markdown, export_to_json
+from anji.pipeline import Pipeline, run_full_pipeline, batch_pipeline
+from anji.pdf_converter import PDFToMarkdownConverter, get_default_converter
+from anji.ast_handler import MarkdownAST
+from anji.image_analyzer import ImageAnalyzer, get_default_analyzer
+from anji.enhancement import Enhancer
+from anji.exporters import export_to_markdown, export_to_json
 
 __all__ = [
     # Pipeline

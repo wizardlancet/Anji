@@ -4,16 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Chinvat** is a Python package that converts PDFs to AI-agent-ready Markdown/JSON documents. It uses PaddleOCR-VL for PDF-to-Markdown conversion and Ovis2.5-9B (VLM) for image analysis, with Mistune for AST manipulation.
+**Anji (安济桥)** is a Python package that converts PDFs to AI-agent-ready Markdown/JSON documents. It uses PaddleOCR-VL for PDF-to-Markdown conversion and Ovis2.5-9B (VLM) for image analysis, with Mistune for AST manipulation.
 
 ## Project Structure
 
 ```
-chinvat/                 # GitHub repository root
-├── chinvat/           # Main Python package
+anji/                   # GitHub repository root
+├── anji/             # Main Python package
 │   ├── __init__.py   # Package exports
 │   ├── main.py       # CLI entry point
-│   ├── __main__.py   # python -m chinvat
+│   ├── __main__.py   # python -m anji
 │   ├── cli.py        # CLI commands
 │   ├── pipeline.py   # Pipeline orchestration
 │   ├── pdf_converter.py
@@ -41,18 +41,18 @@ pytest
 pytest tests/test_pipeline.py
 
 # Format code
-black chinvat/
+black anji/
 
 # Lint code
-ruff check chinvat/
+ruff check anji/
 
 # Type checking
-mypy chinvat/
+mypy anji/
 ```
 
 ## Architecture
 
-**4-Stage Processing Pipeline** (`chinvat/pipeline.py`):
+**4-Stage Processing Pipeline** (`anji/pipeline.py`):
 1. **PDF → Raw Markdown** (`pdf_converter.py`) - PaddleOCR-VL server on port 8118
 2. **Markdown → AST** (`ast_handler.py`) - Parse with Mistune
 3. **AST → Enhanced AST** (`enhancement.py`, `image_analyzer.py`) - VLM image analysis, heading fixes, decorative filtering
@@ -66,11 +66,11 @@ mypy chinvat/
 - `enhancement.py` - Heading fixes, image filtering, enrichment
 - `exporters.py` - export_to_markdown, export_to_json, export_to_structured_data
 
-**Exported API** (`chinvat/__init__.py`):
+**Exported API** (`anji/__init__.py`):
 ```python
-from chinvat import Pipeline, run_full_pipeline, batch_pipeline
-from chinvat import PDFToMarkdownConverter, MarkdownAST, ImageAnalyzer, Enhancer
-from chinvat import export_to_markdown, export_to_json
+from anji import Pipeline, run_full_pipeline, batch_pipeline
+from anji import PDFToMarkdownConverter, MarkdownAST, ImageAnalyzer, Enhancer
+from anji import export_to_markdown, export_to_json
 ```
 
 ## External Service Dependencies
@@ -84,21 +84,21 @@ Environment variables: `API_BASE_URL`, `API_KEY`, `MODEL_NAME`, `PROMPT`
 
 ```bash
 # Full pipeline
-chinvat pipeline input.pdf output_dir [--format markdown|json|structured|both]
+anji pipeline input.pdf output_dir [--format markdown|json|structured|both]
 
 # Batch processing
-chinvat batch output_base file1.pdf [file2.pdf...]
+anji batch output_base file1.pdf [file2.pdf...]
 
 # Individual steps
-chinvat pdf input.pdf output_dir [--no-merge-tables]
-chinvat image input.md output.md [--vlm-url http://localhost:8000/v1]
-chinvat md enhance input.md output.md
-chinvat md export input.md output [--format markdown|json|structured]
+anji pdf input.pdf output_dir [--no-merge-tables]
+anji image input.md output.md [--vlm-url http://localhost:8000/v1]
+anji md enhance input.md output.md
+anji md export input.md output [--format markdown|json|structured]
 
 # All modules support --dummy flag for testing without API calls
 
 # Run as Python module
-python -m chinvat pipeline input.pdf output_dir
+python -m anji pipeline input.pdf output_dir
 ```
 
 ## Code Style

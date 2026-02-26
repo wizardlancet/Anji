@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chinvat"
+name = "anji"
 version = "0.1.0"
 description = "PDF to AI Agent Knowledge Bridge - Convert PDFs to enhanced Markdown/JSON"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Chinvat Contributors"}
+    {name = "Anji Contributors"}
 ]
 keywords = ["pdf", "markdown", "ocr", "ai", "knowledge"]
 classifiers = [
@@ -40,11 +40,11 @@ dev = [
 ]
 
 [project.scripts]
-chinvat = "chinvat.main:main"
+anji = "anji.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["chinvat*"]
+include = ["anji*"]
 
 [tool.black]
 line-length = 100
