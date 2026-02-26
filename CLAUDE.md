@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Anji (安济桥)** is a Python package that converts PDFs to AI-agent-ready Markdown/JSON documents. It uses PaddleOCR-VL for PDF-to-Markdown conversion and Ovis2.5-9B (VLM) for image analysis, with Mistune for AST manipulation.
+**Anji-Bridge (安济桥)** is a Python package that converts PDFs to AI-agent-ready Markdown/JSON documents. It uses PaddleOCR-VL for PDF-to-Markdown conversion and Ovis2.5-9B (VLM) for image analysis, with Mistune for AST manipulation.
 
 ## Project Structure
 

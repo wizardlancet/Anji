@@ -1,6 +1,6 @@
 <div align="center">
 
-# Anji (安济桥)
+# Anji-Bridge (安济桥)
 
 **PDF 转 AI Agent 知识桥梁**
 

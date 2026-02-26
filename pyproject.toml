@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "anji"
+name = "anji-bridge"
 version = "0.1.0"
 description = "PDF to AI Agent Knowledge Bridge - Convert PDFs to enhanced Markdown/JSON"
 readme = "README.md"
